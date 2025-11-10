@@ -177,29 +177,46 @@ async def download_video(request: DownloadRequest, req: Request):
         metadata = await loop.run_in_executor(executor, get_video_metadata, request.url)
         safe_title = sanitize_filename(metadata["title"])
 
-        if request.quality == "MP3":
-            output_filename = f"{safe_title}.mp3"
-            output_path = STORAGE_PATH / output_filename
-            ydl_opts = {
-                "format": "bestaudio/best",
-                "outtmpl": str(STORAGE_PATH / f"{safe_title}.%(ext)s"),
-                "postprocessors": [{
-                    "key": "FFmpegExtractAudio",
-                    "preferredcodec": "mp3",
-                    "preferredquality": "192",
-                }],
-                "quiet": True,
-            }
-        else:
-            output_filename = f"{safe_title}.mp4"
-            output_path = STORAGE_PATH / output_filename
-            quality_num = request.quality.replace("p", "")
-            ydl_opts = {
-                "format": f"bestvideo[height<={quality_num}]+bestaudio/best[height<={quality_num}]",
-                "outtmpl": str(STORAGE_PATH / f"{safe_title}.%(ext)s"),
-                "merge_output_format": "mp4",
-                "quiet": True,
-            }
+       cookie_path = ROOT_DIR / "cookies.txt"
+
+common_opts = {
+    "cookiefile": str(cookie_path) if cookie_path.exists() else None,
+    "headers": {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/118.0.5993.70 Safari/537.36"
+        ),
+        "Accept-Language": "en-US,en;q=0.9",
+    },
+    "quiet": True,
+    "no_warnings": True,
+}
+
+if request.quality == "MP3":
+    output_filename = f"{safe_title}.mp3"
+    output_path = STORAGE_PATH / output_filename
+    ydl_opts = {
+        **common_opts,
+        "format": "bestaudio/best",
+        "outtmpl": str(STORAGE_PATH / f"{safe_title}.%(ext)s"),
+        "postprocessors": [{
+            "key": "FFmpegExtractAudio",
+            "preferredcodec": "mp3",
+            "preferredquality": "192",
+        }],
+    }
+else:
+    output_filename = f"{safe_title}.mp4"
+    output_path = STORAGE_PATH / output_filename
+    quality_num = request.quality.replace("p", "")
+    ydl_opts = {
+        **common_opts,
+        "format": f"bestvideo[height<={quality_num}]+bestaudio/best[height<={quality_num}]",
+        "outtmpl": str(STORAGE_PATH / f"{safe_title}.%(ext)s"),
+        "merge_output_format": "mp4",
+    }
+
 
         def download_file():
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
