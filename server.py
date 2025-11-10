@@ -87,20 +87,20 @@ def get_video_metadata(url: str) -> dict:
         cookie_path = ROOT_DIR / "cookies.txt"
 
         ydl_opts = {
-            "quiet": True,
-            "no_warnings": True,
-            "extract_flat": False,
-            "cookiefile": str(cookie_path) if cookie_path.exists() else None,
-            "headers": {
-                "User-Agent": (
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/118.0.5993.70 Safari/537.36"
-                ),
-                "Accept-Language": "en-US,en;q=0.9",
-            },
-            "proxy": "https://translate.google.com:443",  # Optional fallback
-        }
+    "quiet": True,
+    "no_warnings": True,
+    "extract_flat": False,
+    "cookiefile": str(cookie_path) if cookie_path.exists() else None,
+    "headers": {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/118.0.5993.70 Safari/537.36"
+        ),
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+}
+
 
         logger.info(f"Fetching metadata for: {url}")
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
