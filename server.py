@@ -300,11 +300,16 @@ async def shutdown_db_client():
 
 
 # === Middleware and router ===
-app.include_router(api_router)
+from starlette.middleware.cors import CORSMiddleware
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    allow_origins=[
+        "https://ssvid.fun",
+        "https://www.ssvid.fun",
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
