@@ -302,6 +302,9 @@ async def shutdown_db_client():
 # === Middleware and router ===
 from starlette.middleware.cors import CORSMiddleware
 
+# include all API endpoints
+app.include_router(api_router)
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
@@ -312,4 +315,5 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
